@@ -1,0 +1,65 @@
+fan_speed1:
+     shelly: 0.249
+     multimeter: 0.24
+     pf: 0.57
+
+fan_speed2:
+     shelly: 0.304
+     multimeter: 0.29
+     pf: 0.57
+
+fan_speed3:
+     shelly: 0.381
+     multimeter: 0.361
+     pf: 0.58
+
+rice_cooker:
+     shelly: 5.58
+     multimeter: 5.35
+     pf: 1.0
+
+lamp_low:
+     shelly: 0.04
+     multimeter: 0.04
+     pf: 0.48
+
+lamp_mid:
+     shelly: 0.095
+     multimeter: 0.074
+     pf: 0.66
+
+lamp_high:
+     shelly: 0.153
+     multimeter: 0.112
+     pf: 0.73
+
+phone_charger:
+     shelly: 0.397
+     multimeter: 0.205
+     pf: 0.59
+
+vacuum:
+     shelly: 5.235
+     multimeter: 4.59
+     pf: 0.96
+
+air_fryer_coil:
+     shelly: 11.96
+     multimeter: 11.5
+     pf: 1.00
+
+air_fryer_fan:
+     shelly: 0.534
+     multimeter: 0.5
+     pf: 0.58
+
+
+t_shirt_press_on:
+     shelly: 14.1
+     multimeter: 13.59
+     pf: 1.00
+
+t_shirt_press_off:
+     shelly: 0.02
+     multimeter: 0.02
+     pf: 0.63
