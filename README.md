@@ -1,2 +1,2 @@
-# jigAUwatt
+# JiggAUwatt
 Senior Design Watt Meter Project
