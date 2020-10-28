@@ -12,14 +12,12 @@ app = Quart(__name__)
 async def index(states=list,states_to_str=str):
     # file1 = open("onoff.txt", "r+")
 
-    # if request.method == 'POST':
-    #     states: object = request.form.getlist('mycheckbox')
-    #     print(states)
-    #     states_to_str: object = ' '.join(states)
-    #     print(states_to_str)
-    #     file1.write(states_to_str)
-    #     file1.close()
-    #     return await render_template('index.html')
+    if request.method == 'POST':
+        states: object = request.form.getlist('1a_submit_button')
+        print(states)
+        # do stuff here to send command to shelly once toggle button is pressed
+        return render_template('index.html')
+    
     request.method
     request.url
     # device = await TasmotaDevice.connect()
