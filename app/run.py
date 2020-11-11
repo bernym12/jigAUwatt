@@ -3,8 +3,8 @@ from quart import Quart, render_template, request
 # from wtforms import RadioField
 from app import app
 import asyncio
-from tasmotadevicecontroller import TasmotaDevice
-from tasmotadevicecontroller import tasmota_types as t
+from tasmota_device_controller.tasmotadevicecontroller import TasmotaDevice
+from tasmota_device_controller.tasmotadevicecontroller import tasmota_types as t
 
 app = Quart(__name__)
 
@@ -13,33 +13,32 @@ async def index(states=list,states_to_str=str):
     # file1 = open("onoff.txt", "r+")
 
     if request.method == 'POST':
-        states: object = request.form.getlist('1a_submit_button')
+        # states: object = await request.form.getlist('1b_submit_button')
+        device = await TasmotaDevice.connect('192.168.1.60')
+        setResult = await device.setPower(t.PowerType.TOGGLE, output=t.FriendlyNameOutputType.OUTPUT_2)
+
         print(states)
         # do stuff here to send command to shelly once toggle button is pressed
-        return render_template('index.html')
+        return await render_template('index.html')
     
-    request.method
-    request.url
     # device = await TasmotaDevice.connect()
 
 
 
     return await render_template('index.html')
 
-async def main():
-    device = await TasmotaDevice.connect('192.168.43.139')
+# async def main():
 
-    # Get friendly name (of first output, which is the default output)
-    nameResult = await device.getFriendlyName(ouput=t.FriendlyNameOutputType.OUTPUT_2)
-    print(nameResult)  # Returns 'My Tasmota Plug'
+#     # Get friendly name (of first output, which is the default output)
+#     nameResult = await device.getFriendlyName(ouput=t.FriendlyNameOutputType.OUTPUT_2)
+#     print(nameResult)  # Returns 'My Tasmota Plug'
 
-    # Get power of first output
-    getResult = await device.getPower()
-    print(getResult)  # Returns True (on)
+#     # Get power of first output
+#     getResult = await device.getPower()
+#     print(getResult)  # Returns True (on)
 
     # Set power of first output to on
-    setResult = await device.setPower(t.PowerType.OFF, output=t.FriendlyNameOutputType.OUTPUT_2)
-    print(setResult)  # Returns True or False (depending if the device was switched on or off)
+    # print(setResult)  # Returns True or False (depending if the device was switched on or off)
 
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(main())
