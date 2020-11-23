@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js" integrity="sha512-zO8oeHCxetPn1Hd9PdDleg5Tw1bAaP0YmNvPY8CwcRyUk7d7/+nyElmFrB6f7vg4f7Fv4sui1mcep8RIEShczg==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -11,32 +18,199 @@
 <body>
 <img src="https://drive.google.com/uc?export=view&id=1SDHXkxHxRpd3oUOD355jmJU1drz_br_Q" width="400" height="100"></img>
         <h1>JiggAUWatt Access Page</h1>
-        <form>
+        <form id='ip' name='ip' action="{{ url_for('add_ip')}}" method="POST">
             <fieldset>
               <legend>Shelly IP</legend>
               <p>
                 <label>IP</label>
                 <input type = "text"
-                       id = "myText"
+                       id = "ip"
+                       name="ip"
                        placeholder = "192.168.1.1" />
               </p>
+              <input type="submit" value="Submit"/>
             </fieldset>
-          </form>
-    <form method="POST" action="/">
-        <h3>Shelly 1 Top Outlet</h3>
-    <input type="submit" name="1a_submit_button" value="Toggle ON/OFF">
-        <br><br>
-        <h3>Shelly 1 Bottom Outlet</h3>
-    <input type="submit" name="1b_submit_button" value="Toggle ON/OFF">
-        <br><br>
-        <h3>Shelly 2 Top Outlet</h3>
-    <input type="submit" name="2a_submit_button" value="Toggle ON/OFF">
-        <br><br>
-        <h3>Shelly 2 Bottom Outlet</h3>
-    <input type="submit" name="2b_submit_button" value="Toggle ON/OFF">
-        <br><br><br>
-        <input type="submit" value="Confirm Changes">
-    </form>
+        </form>
+    </div>
+    {%if result%}
+        {% for value in result %}
+            <h3 id="{{value}}">{{value}}</h3>
+            <h3>Bottom Outlet</h3>
+            <div class="container">
+                <canvas  id="{{value}}_outlet1" width="600" height="400"></canvas>
+                <script>
+                    var ctx = document.getElementById('{{value}}_outlet1').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                label: 'Power Consumption',
+                                data: [
+                                {x: new Date(),
+                                    y: 3},
+                                    {x: new Date(2020,11,23,14,25),
+                                    y: 3},
+                                ],
+                                
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute'
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                    </script>
+            </div>
+            <form id='{{value}}_bottom' action="{{url_for('toggle')}}" method="POST">
+                <input type="submit" class='toggle' checked data-toggle='toggle' id='{{value}}_top'  value="Toggle">
+            </form>
+            <br><br>
+            <h3>Top Outlet</h3>
+            <div class="container">
+                <canvas  id="{{value}}_outlet2" width="600" height="400"></canvas>
+                <script>
+                    var ctx = document.getElementById('{{value}}_outlet2').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                label: 'Power Consumption',
+                                data: [
+                                    {x: new Date(),
+                                    y: 20},
+                                    {x: new Date(),
+                                    y: 20},
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute'
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                    </script>
 
+            </div>
+            <form id='{{value}}_bottom' action="{{url_for('toggle')}} method="POST">
+                <input type="submit" class='toggle' checked data-toggle='toggle' id='{{value}}_bottom'  value="Toggle">
+            </form>
+        {% endfor %}
+    {% endif %}
+    <script>
+        // Only run what comes next *after* the page has loaded
+        addEventListener("DOMContentLoaded", function() {
+          // Grab all of the elements with a class of command
+          // (which all of the buttons we just created have)
+          var commandButtons = document.querySelectorAll("input[type=checkbox]");
+          for (var i=0, l=commandButtons.length; i<l; i++) {
+            var button = commandButtons[i];
+            // For each button, listen for the "click" event
+            button.addEventListener("click", function(e) {
+              // When a click happens, stop the button
+              // from submitting our form (if we have one)
+              e.preventDefault();
+        
+              var clickedButton = e.target;
+              var command = clickedButton.id;
+        
+              // Now we need to send the data to our server
+              // without reloading the page - this is the domain of
+              // AJAX (Asynchronous JavaScript And XML)
+              // We will create a new request object
+              // and set up a handler for the response
+              var request = new XMLHttpRequest();
+            //   request.onload = function() {
+            //       // We could do more interesting things with the response
+            //       // or, we could ignore it entirely
+            //     //   alert(request.responseText);
+            //   };
+              // We point the request at the appropriate command
+              request.open("GET", "/" + command, true);
+              // and then we send it off
+              request.send();
+            });
+          }
+        }, true);
+        </script>
 </body>
 </html>
+<script> 
+$(function() {
+    $('button').click(function() {
+        $.ajax({
+            url: '/signUpUser',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+})
+   </script>
+
+
+
+<!-- <script>
+    // Only run what comes next *after* the page has loaded
+    addEventListener("DOMContentLoaded", function() {
+      // Grab all of the elements with a class of command
+      // (which all of the buttons we just created have)
+      var commandButtons = document.querySelectorAll("input[type=checkbox]");
+      for (var i=0, l=commandButtons.length; i<l; i++) {
+        var button = commandButtons[i];
+        // For each button, listen for the "click" event
+        button.addEventListener("click", function(e) {
+          // When a click happens, stop the button
+          // from submitting our form (if we have one)
+          e.preventDefault();
+    
+          var clickedButton = e.target;
+          var command = clickedButton.id;
+    
+          // Now we need to send the data to our server
+          // without reloading the page - this is the domain of
+          // AJAX (Asynchronous JavaScript And XML)
+          // We will create a new request object
+          // and set up a handler for the response
+          var request = new XMLHttpRequest();
+          request.onload = function() {
+              // We could do more interesting things with the response
+              // or, we could ignore it entirely
+              alert(request.responseText);
+          };
+          // We point the request at the appropriate command
+          request.open("GET", "/" + command, true);
+          // and then we send it off
+          request.send();
+        });
+      }
+    }, true);
+    </script> -->
